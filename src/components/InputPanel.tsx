@@ -23,15 +23,15 @@ function SliderInput({ label, value, min, max, step, unit, onChange }: SliderInp
             step={step}
             min={min}
             max={max}
-            onChange={e => onChange(parseFloat(e.target.value) || 0)}
-            className="w-20 text-right text-xs bg-slate-700 text-emerald-400 font-mono font-semibold border border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:border-emerald-500"
+              onChange={e => onChange(parseFloat(e.target.value) || 0)}
+              className="w-20 text-right text-xs bg-white text-bentoli-green font-mono font-semibold border border-slate-200 rounded px-1 py-0.5 focus:outline-none focus:border-bentoli-green"
           />
           {unit && <span className="text-xs text-slate-500 w-8">{unit}</span>}
         </div>
       </div>
-      <div className="relative h-1.5 bg-slate-700 rounded-full">
+      <div className="relative h-1.5 bg-gray-200 rounded-full">
         <div
-          className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full"
+          className="absolute top-0 left-0 h-full bg-bentoli-green rounded-full"
           style={{ width: `${pct}%` }}
         />
         <input
@@ -44,7 +44,7 @@ function SliderInput({ label, value, min, max, step, unit, onChange }: SliderInp
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         <div
-          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-900 pointer-events-none"
+          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-bentoli-green rounded-full border-2 border-white pointer-events-none"
           style={{ left: `calc(${pct}% - 6px)` }}
         />
       </div>
@@ -88,19 +88,32 @@ export function InputPanel({ params: p, onChange }: Props) {
         <SliderInput label="Feed Cost" value={p.controlFeedCost} min={10} max={100} step={0.1} unit="Rs/kg" onChange={set('controlFeedCost')} />
       </Section>
 
-      <Section title="Performance — Treatment (Pelex)" color="text-emerald-400">
+      <Section title="Performance — Treatment (Pelex)" color="text-bentoli-green">
         <SliderInput label="Throughput" value={p.treatmentThroughput} min={5} max={20} step={0.1} unit="t/hr" onChange={set('treatmentThroughput')} />
         <SliderInput label="Ampere Load" value={p.treatmentAmpereLoad} min={50} max={400} step={0.5} unit="A" onChange={set('treatmentAmpereLoad')} />
         <SliderInput label="FCR" value={p.treatmentFCR} min={1.0} max={3.0} step={0.01} onChange={set('treatmentFCR')} />
+        <SliderInput
+          label="Treatment Feed Cost"
+          value={
+            p.treatmentFeedCost !== undefined
+              ? p.treatmentFeedCost
+              : p.controlFeedCost + p.pelexCost * p.pelexDosage
+          }
+          min={10}
+          max={200}
+          step={0.1}
+          unit="Rs/kg"
+          onChange={set('treatmentFeedCost')}
+        />
       </Section>
 
-      <Section title="Power & Electricity" color="text-sky-400">
+      <Section title="Power & Electricity" color="text-bentoli-navy">
         <SliderInput label="Voltage" value={p.voltage} min={200} max={600} step={10} unit="V" onChange={set('voltage')} />
         <SliderInput label="Power Unit Cost" value={p.powerUnitCost} min={1} max={50} step={0.5} unit="Rs/kWh" onChange={set('powerUnitCost')} />
         <SliderInput label="Rated Capacity" value={p.ratedCapacity} min={1} max={30} step={0.5} unit="t/hr" onChange={set('ratedCapacity')} />
       </Section>
 
-      <Section title="Boiler & Fuel" color="text-amber-400">
+      <Section title="Boiler & Fuel" color="text-bentoli-green">
         <SliderInput label="Boiler Fuel Cost" value={p.boilerFuelCost} min={1} max={30} step={0.1} unit="Rs/kg" onChange={set('boilerFuelCost')} />
         <SliderInput label="Boiler Fuel Consumption" value={p.boilerFuel} min={1} max={30} step={0.1} unit="kg/t" onChange={set('boilerFuel')} />
       </Section>

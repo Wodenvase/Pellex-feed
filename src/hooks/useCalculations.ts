@@ -3,7 +3,10 @@ import type { InputParams, Results } from '../types';
 
 export function useCalculations(p: InputParams): Results {
   return useMemo(() => {
-    const treatmentFeedCost = p.controlFeedCost + p.pelexCost * p.pelexDosage;
+    const treatmentFeedCost =
+      p.treatmentFeedCost !== undefined
+        ? p.treatmentFeedCost
+        : p.controlFeedCost + p.pelexCost * p.pelexDosage;
 
     const throughputDiff = p.treatmentThroughput - p.controlThroughput;
     const ampereLoadDiff = p.treatmentAmpereLoad - p.controlAmpereLoad;
@@ -26,8 +29,8 @@ export function useCalculations(p: InputParams): Results {
     const dieTreatment = (p.dieReplacementCost * p.ratedCapacity) / (p.dieLife * p.treatmentThroughput);
     const die = { control: dieControl, treatment: dieTreatment, savings: dieControl - dieTreatment };
 
-    const fixedControl = (p.fixedRunningCost * p.ratedCapacity) / p.controlThroughput;
-    const fixedTreatment = (p.fixedRunningCost * p.ratedCapacity) / p.treatmentThroughput;
+    const fixedControl = (p.fixedRunningCost * p.ratedCapacity * (24 / p.factoryRunningTime)) / p.controlThroughput;
+    const fixedTreatment = (p.fixedRunningCost * p.ratedCapacity * (24 / p.factoryRunningTime)) / p.treatmentThroughput;
     const fixedFactory = { control: fixedControl, treatment: fixedTreatment, savings: fixedControl - fixedTreatment };
 
     const totalDirectControl = elecControl + boilerControl + dieControl + fixedControl;
@@ -52,7 +55,7 @@ export function useCalculations(p: InputParams): Results {
     };
 
     const additionalRevenue = chickenBenefit * p.chickenSellingPrice;
-    const additionalFeedCost = chickenBenefit * treatmentFeedCost * p.treatmentFCR;
+    const additionalFeedCost = productionCost.benefit;
     const netIndirectRevenue = additionalRevenue - additionalFeedCost;
 
     const totalReturn = totalDirect.savings + netIndirectRevenue;

@@ -34,7 +34,7 @@ export function WaterfallChart({ title, steps, unit = 'Rs/ton' }: Props) {
   const toY = (v: number) => svgH * (1 - (v - minV) / range);
 
   return (
-    <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700/50">
+    <div className="bg-white rounded-xl p-4 border border-slate-200">
       <h4 className="text-xs font-semibold text-slate-300 mb-3 uppercase tracking-wider">{title}</h4>
       <div className="overflow-x-auto">
         <svg width={totalW + 20} height={svgH + 40} className="min-w-full">

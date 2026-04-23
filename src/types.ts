@@ -6,6 +6,7 @@ export interface InputParams {
   controlFCR: number;
   treatmentFCR: number;
   controlFeedCost: number;
+  treatmentFeedCost?: number;
   voltage: number;
   powerUnitCost: number;
   boilerFuelCost: number;

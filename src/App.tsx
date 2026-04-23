@@ -8,15 +8,17 @@ import { MetricCard } from './components/MetricCard';
 import { useCalculations } from './hooks/useCalculations';
 import type { InputParams } from './types';
 import { TrendingUp, Zap, Flame, Settings, BarChart2, DollarSign, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import bentoliLogo from './assets/bentoli.png';
 
 const DEFAULT_PARAMS: InputParams = {
-  controlThroughput: 9.5,
-  treatmentThroughput: 9.8,
+  controlThroughput: 9,
+  treatmentThroughput: 9.5,
   controlAmpereLoad: 168.5,
   treatmentAmpereLoad: 147.6,
   controlFCR: 1.5,
-  treatmentFCR: 1.48,
+  treatmentFCR: 1.45,
   controlFeedCost: 40,
+  treatmentFeedCost: 40.12,
   voltage: 440,
   powerUnitCost: 10,
   boilerFuelCost: 6.5,
@@ -25,7 +27,7 @@ const DEFAULT_PARAMS: InputParams = {
   dieReplacementCost: 350000,
   dieLife: 10000,
   factoryRunningTime: 22,
-  fixedRunningCost: 327.275,
+  fixedRunningCost: 300,
   pelexCost: 120,
   chickenSellingPrice: 90,
   pelexDosage: 0.001,
@@ -66,26 +68,26 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <header className="bg-slate-900 border-b border-slate-800 px-5 py-3 flex items-center justify-between z-20 sticky top-0">
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col">
+      <header className="bg-white border-b border-slate-200 px-5 py-3 flex items-center justify-between z-20 sticky top-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Settings size={15} className="text-slate-900" />
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <img src={bentoliLogo} alt="Bentoli" className="w-full h-full object-contain" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-sm font-bold text-slate-100">Interactive Model for Pellet Feed Manufacturing</h1>
+            <h1 className="text-sm font-bold text-slate-800">Pellet Feed ROI — Interactive Model</h1>
             <p className="text-[10px] text-slate-500">Control vs Treatment (Pelex) — real-time analysis</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-2 bg-slate-800 border border-emerald-800/40 rounded-lg px-3 py-1.5">
+          <div className="hidden sm:flex items-center gap-2 bg-gray-50 border border-slate-200 rounded-lg px-3 py-1.5">
             <span className="text-[10px] text-slate-500">Total ROI</span>
-            <span className="text-sm font-bold text-emerald-400 font-mono">{fmt2(r.totalROI)}%</span>
+            <span className="text-sm font-bold text-emerald-600 font-mono">{fmt2(r.totalROI)}%</span>
             <span className="text-[10px] text-slate-600">on ₹{params.pelexCost}/kg</span>
           </div>
           <button
             onClick={() => setParams(DEFAULT_PARAMS)}
-            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors border border-slate-700 hover:border-slate-600 rounded-lg px-2.5 py-1.5"
+            className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300 rounded-lg px-2.5 py-1.5"
           >
             <RotateCcw size={11} />
             <span className="hidden sm:inline">Reset</span>
@@ -95,12 +97,12 @@ export default function App() {
 
       <div className="flex flex-1 overflow-hidden h-[calc(100vh-53px)]">
         <aside
-          className={`${sidebarOpen ? 'w-72' : 'w-0'} flex-shrink-0 bg-slate-900 border-r border-slate-800 overflow-hidden transition-all duration-200 relative`}
+          className={`${sidebarOpen ? 'w-72' : 'w-0'} flex-shrink-0 bg-gray-50 border-r border-slate-200 overflow-hidden transition-all duration-200 relative`}
         >
           <div className="p-4 h-full overflow-y-auto">
             <div className="mb-3">
               <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Input Parameters</h2>
-              <p className="text-[9px] text-slate-700 mt-0.5">Adjust sliders or type values to update all results live.</p>
+              <p className="text-[9px] text-slate-600 mt-0.5">Adjust sliders or type values to update all results live.</p>
             </div>
             <InputPanel params={params} onChange={setParams} />
           </div>
@@ -108,22 +110,22 @@ export default function App() {
 
         <button
           onClick={() => setSidebarOpen(o => !o)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-slate-800 border border-slate-700 rounded-r-lg p-1 text-slate-500 hover:text-slate-300 transition-colors"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-white border border-slate-200 rounded-r-lg p-1 text-slate-600 hover:text-slate-800 transition-colors shadow-sm"
           style={{ left: sidebarOpen ? '18rem' : '0rem' }}
         >
           {sidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
         </button>
 
         <main className="flex-1 overflow-y-auto p-5 relative">
-          <div className="flex gap-1 mb-5 bg-slate-800/60 rounded-lg p-1 w-fit border border-slate-700/40">
+          <div className="flex gap-1 mb-5 bg-white rounded-lg p-1 w-fit border border-slate-200">
             {TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 ${
                   activeTab === tab.id
-                    ? 'bg-slate-700 text-slate-100 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-300'
+                    ? 'bg-bentoli-green text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-800'
                 }`}
               >
                 {tab.icon}
@@ -135,15 +137,15 @@ export default function App() {
           {activeTab === 'overview' && (
             <div className="space-y-4 animate-fade-in">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <MetricCard label="Direct Savings/Ton" value={`₹${fmt2(r.totalDirect.savings)}`} sub="Processing cost reduction" color="text-sky-400" icon={<DollarSign size={14} />} trend="up" />
-                <MetricCard label="FCR Benefit/Ton" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="Net indirect revenue" color="text-emerald-400" icon={<TrendingUp size={14} />} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
-                <MetricCard label="Total Return/Ton" value={`₹${fmt2(r.totalReturn)}`} sub="Direct + Indirect benefits" color="text-amber-400" icon={<BarChart2 size={14} />} trend={r.totalReturn >= 0 ? 'up' : 'down'} />
-                <MetricCard label="Total ROI" value={`${fmt2(r.totalROI)}%`} sub={`On ₹${params.pelexCost}/kg Pelex`} color="text-emerald-400" icon={<TrendingUp size={14} />} trend={r.totalROI >= 0 ? 'up' : 'down'} />
+                <MetricCard label="Direct Savings/Ton" value={`₹${fmt2(r.totalDirect.savings)}`} sub="Processing cost reduction" color="text-bentoli-navy" icon={<DollarSign size={14} />} trend="up" />
+                <MetricCard label="FCR Benefit/Ton" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="Net indirect revenue" color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
+                <MetricCard label="Total Return/Ton" value={`₹${fmt2(r.totalReturn)}`} sub="Direct + Indirect benefits" color="text-bentoli-navy" icon={<BarChart2 size={14} />} trend={r.totalReturn >= 0 ? 'up' : 'down'} />
+                <MetricCard label="Total ROI" value={`${fmt2(r.totalROI)}%`} sub={`On ₹${params.pelexCost}/kg Pelex`} color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.totalROI >= 0 ? 'up' : 'down'} />
               </div>
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <MetricCard label="Throughput Gain" value={`${r.throughputDiff >= 0 ? '+' : ''}${r.throughputDiff.toFixed(2)} t/hr`} sub={`${params.controlThroughput} → ${params.treatmentThroughput}`} color={r.throughputDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'} trend={r.throughputDiff >= 0 ? 'up' : 'down'} />
-                <MetricCard label="Ampere Change" value={`${r.ampereLoadDiff.toFixed(1)} A`} sub={`${params.controlAmpereLoad} → ${params.treatmentAmpereLoad}`} color={r.ampereLoadDiff <= 0 ? 'text-emerald-400' : 'text-rose-400'} trend={r.ampereLoadDiff <= 0 ? 'up' : 'down'} />
+                <MetricCard label="Throughput Gain" value={`${r.throughputDiff >= 0 ? '+' : ''}${r.throughputDiff.toFixed(2)} t/hr`} sub={`${params.controlThroughput} → ${params.treatmentThroughput}`} color={r.throughputDiff >= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.throughputDiff >= 0 ? 'up' : 'down'} />
+                <MetricCard label="Ampere Change" value={`${r.ampereLoadDiff.toFixed(1)} A`} sub={`${params.controlAmpereLoad} → ${params.treatmentAmpereLoad}`} color={r.ampereLoadDiff <= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.ampereLoadDiff <= 0 ? 'up' : 'down'} />
                 <MetricCard label="FCR Change" value={`${r.fcrDiff >= 0 ? '+' : ''}${r.fcrDiff.toFixed(3)}`} sub={`${params.controlFCR} → ${params.treatmentFCR}`} color={r.fcrDiff <= 0 ? 'text-emerald-400' : 'text-rose-400'} trend={r.fcrDiff <= 0 ? 'up' : 'down'} />
                 <MetricCard label="Extra Chicken/Ton" value={`+${r.chickenProduction.benefit.toFixed(2)} kg`} sub={`${r.chickenProduction.control.toFixed(2)} → ${r.chickenProduction.treatment.toFixed(2)}`} color="text-emerald-400" trend="up" />
               </div>
@@ -163,15 +165,15 @@ export default function App() {
                 />
               </div>
 
-              <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
-                <div className="px-4 py-2.5 border-b-2 border-sky-500 bg-slate-800/80">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-200">ROI Summary</h4>
+              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div className="px-4 py-2.5 border-b-2 border-bentoli-green bg-white">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-800">ROI Summary</h4>
                 </div>
-                <div className="grid grid-cols-3 divide-x divide-slate-700/60">
+                <div className="grid grid-cols-3 divide-x divide-slate-200">
                   {[
-                    { label: 'Processing Cost Savings/Ton', value: r.totalDirect.savings, sub: 'Direct Savings', color: 'text-sky-400' },
-                    { label: 'FCR Benefit/Ton of Feed', value: r.netIndirectRevenue, sub: 'Indirect ROI', color: 'text-emerald-400' },
-                    { label: 'Total Return/Ton of Feed', value: r.totalReturn, sub: `ROI: ${fmt2(r.totalROI)}% on ₹${params.pelexCost}`, color: 'text-amber-400' },
+                    { label: 'Processing Cost Savings/Ton', value: r.totalDirect.savings, sub: 'Direct Savings', color: 'text-bentoli-navy' },
+                    { label: 'FCR Benefit/Ton of Feed', value: r.netIndirectRevenue, sub: 'Indirect ROI', color: 'text-bentoli-green' },
+                    { label: 'Total Return/Ton of Feed', value: r.totalReturn, sub: `ROI: ${fmt2(r.totalROI)}% on ₹${params.pelexCost}`, color: 'text-bentoli-navy' },
                   ].map(m => (
                     <div key={m.label} className="p-4 text-center">
                       <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{m.label}</div>
@@ -213,12 +215,12 @@ export default function App() {
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                  { label: 'Electricity Savings', value: r.electricity.savings, icon: <Zap size={14} />, color: 'text-amber-400' },
-                  { label: 'Boiler Savings', value: r.boiler.savings, icon: <Flame size={14} />, color: 'text-orange-400' },
-                  { label: 'Die Savings', value: r.die.savings, icon: <Settings size={14} />, color: 'text-violet-400' },
-                  { label: 'Fixed Cost Savings', value: r.fixedFactory.savings, icon: <DollarSign size={14} />, color: 'text-sky-400' },
+                  { label: 'Electricity Savings', value: r.electricity.savings, icon: <Zap size={14} /> },
+                  { label: 'Boiler Savings', value: r.boiler.savings, icon: <Flame size={14} /> },
+                  { label: 'Die Savings', value: r.die.savings, icon: <Settings size={14} /> },
+                  { label: 'Fixed Cost Savings', value: r.fixedFactory.savings, icon: <DollarSign size={14} /> },
                 ].map(m => (
-                  <MetricCard key={m.label} label={m.label} value={`₹${fmt2(m.value)}`} sub="per ton of feed" color={m.value >= 0 ? m.color : 'text-rose-400'} icon={m.icon} trend={m.value >= 0 ? 'up' : 'down'} />
+                  <MetricCard key={m.label} label={m.label} value={`₹${fmt2(m.value)}`} sub="per ton of feed" color={m.value >= 0 ? 'text-bentoli-navy' : 'text-rose-400'} icon={m.icon} trend={m.value >= 0 ? 'up' : 'down'} />
                 ))}
               </div>
             </div>
@@ -239,15 +241,15 @@ export default function App() {
                 />
               </div>
 
-              <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
-                <div className="px-4 py-2.5 border-b-2 border-emerald-500 bg-slate-800/80">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-200">Indirect Revenue Analysis (Per Ton of Feed)</h4>
+              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div className="px-4 py-2.5 border-b-2 border-bentoli-green bg-white">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-800">Indirect Revenue Analysis (Per Ton of Feed)</h4>
                 </div>
-                <div className="grid grid-cols-3 divide-x divide-slate-700/60">
+                <div className="grid grid-cols-3 divide-x divide-slate-200">
                   {[
-                    { label: 'Additional Revenue', value: r.additionalRevenue, sub: `${r.chickenProduction.benefit.toFixed(3)} kg × ₹${params.chickenSellingPrice}/kg`, color: 'text-emerald-400' },
-                    { label: 'Additional Feed Cost', value: -r.additionalFeedCost, sub: `Extra chicken × feed × FCR`, color: 'text-rose-400', abs: true },
-                    { label: 'Net Indirect Revenue', value: r.netIndirectRevenue, sub: 'Revenue − Additional Cost', color: r.netIndirectRevenue >= 0 ? 'text-emerald-400' : 'text-rose-400' },
+                      { label: 'Additional Revenue', value: r.additionalRevenue, sub: `${r.chickenProduction.benefit.toFixed(3)} kg × ₹${params.chickenSellingPrice}/kg`, color: 'text-bentoli-green' },
+                      { label: 'Additional Feed Cost', value: -r.additionalFeedCost, sub: `Extra chicken × feed × FCR`, color: 'text-rose-400', abs: true },
+                      { label: 'Net Indirect Revenue', value: r.netIndirectRevenue, sub: 'Revenue − Additional Cost', color: r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400' },
                   ].map(m => (
                     <div key={m.label} className="p-4 text-center">
                       <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{m.label}</div>
@@ -261,10 +263,10 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <MetricCard label="Treatment Feed Cost" value={`₹${r.treatmentFeedCost.toFixed(4)}/kg`} sub={`Base ₹${params.controlFeedCost} + Pelex ₹${(params.pelexCost * params.pelexDosage).toFixed(4)}`} color="text-slate-300" />
-                <MetricCard label="Extra Chicken/Ton" value={`+${r.chickenProduction.benefit.toFixed(3)} kg`} sub="per ton of feed processed" color="text-emerald-400" trend="up" />
-                <MetricCard label="Chicken Selling Price" value={`₹${params.chickenSellingPrice}/kg`} sub="Market price" color="text-amber-400" />
-                <MetricCard label="Net Benefit" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="per ton of feed" color={r.netIndirectRevenue >= 0 ? 'text-emerald-400' : 'text-rose-400'} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
+                <MetricCard label="Treatment Feed Cost" value={`₹${r.treatmentFeedCost.toFixed(4)}/kg`} sub={`Base ₹${params.controlFeedCost} + Pelex ₹${(params.pelexCost * params.pelexDosage).toFixed(4)}`} color="text-slate-600" />
+                <MetricCard label="Extra Chicken/Ton" value={`+${r.chickenProduction.benefit.toFixed(3)} kg`} sub="per ton of feed processed" color="text-bentoli-green" trend="up" />
+                <MetricCard label="Chicken Selling Price" value={`₹${params.chickenSellingPrice}/kg`} sub="Market price" color="text-bentoli-navy" />
+                <MetricCard label="Net Benefit" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="per ton of feed" color={r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
               </div>
             </div>
           )}
