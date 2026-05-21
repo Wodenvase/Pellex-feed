@@ -146,10 +146,17 @@ export default function App() {
         <div className="space-y-6">
           <section>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <MetricCard label="Direct Savings/Ton" value={`₹${fmt2(r.totalDirect.savings)}`} sub="Processing cost reduction" color="text-bentoli-navy" icon={<DollarSign size={14} />} trend="up" />
-              <MetricCard label="FCR Benefit/Ton" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="Net indirect revenue" color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
-              <MetricCard label="Total Return/Ton" value={`₹${fmt2(r.totalReturn)}`} sub="Direct + Indirect benefits" color="text-bentoli-navy" icon={<BarChart2 size={14} />} trend={r.totalReturn >= 0 ? 'up' : 'down'} />
-              <MetricCard label="Total ROI" value={`${fmt2(r.totalROI)}%`} sub={`On ₹${params.pelexCost}/kg Pelex`} color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.totalROI >= 0 ? 'up' : 'down'} />
+              <MetricCard label="Direct Savings/Ton" value={`₹${fmt2(r.totalDirect.savings)}`} sub="Processing cost reduction" color="text-bentoli-navy" icon={<DollarSign size={14} />} trend="up" trendLabel="Benefit" />
+              <MetricCard label="FCR Benefit/Ton" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="Net indirect revenue" color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} trendLabel={r.netIndirectRevenue >= 0 ? 'Benefit' : 'Loss'} />
+              <MetricCard label="Total Return/Ton" value={`₹${fmt2(r.totalReturn)}`} sub="Direct + Indirect benefits" color="text-bentoli-navy" icon={<BarChart2 size={14} />} trend={r.totalReturn >= 0 ? 'up' : 'down'} trendLabel={r.totalReturn >= 0 ? 'Benefit' : 'Loss'} />
+              <MetricCard label="Total ROI" value={`${fmt2(r.totalROI)}%`} sub={`On ₹${params.pelexCost}/kg Pelex`} color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.totalROI >= 0 ? 'up' : 'down'} trendLabel={r.totalROI >= 0 ? 'Benefit' : 'Loss'} />
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+              <MetricCard label="Throughput Gain" value={`+${fmt2(r.throughputDiff)} t/hr`} secondary={`${fmt2(params.controlThroughput)} → ${fmt2(params.treatmentThroughput)}`} color="text-bentoli-green" trend={r.throughputDiff >= 0 ? 'up' : 'down'} trendLabel="Benefit" />
+              <MetricCard label="Ampere Change" value={`${fmt2(r.ampereLoadDiff)} A`} secondary={`${fmt2(params.controlAmpereLoad)} → ${fmt2(params.treatmentAmpereLoad)}`} color={r.ampereLoadDiff <= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.ampereLoadDiff <= 0 ? 'up' : 'down'} trendLabel={r.ampereLoadDiff <= 0 ? 'Benefit' : 'Loss'} />
+              <MetricCard label="FCR Change" value={`${fmt2(r.fcrDiff)}`} secondary={`${fmt2(params.controlFCR)} → ${fmt2(params.treatmentFCR)}`} color={r.fcrDiff <= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.fcrDiff <= 0 ? 'up' : 'down'} trendLabel={r.fcrDiff <= 0 ? 'Benefit' : 'Loss'} />
+              <MetricCard label="Extra Chicken/Ton" value={`+${fmt2(r.chickenProduction.benefit)} kg`} secondary={`${fmt2(r.chickenProduction.control)} → ${fmt2(r.chickenProduction.treatment)}`} color="text-bentoli-green" trend={r.chickenProduction.benefit >= 0 ? 'up' : 'down'} trendLabel="Benefit" />
             </div>
           </section>
 
@@ -179,12 +186,15 @@ export default function App() {
                   { label: 'FCR Benefit/Ton of Feed', value: r.netIndirectRevenue, sub: 'Indirect ROI', color: 'text-bentoli-green' },
                   { label: 'Total Return/Ton of Feed', value: r.totalReturn, sub: `ROI: ${fmt2(r.totalROI)}% on ₹${params.pelexCost}`, color: 'text-bentoli-navy' },
                 ].map(m => (
-                  <div key={m.label} className="p-4 text-center">
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{m.label}</div>
-                    <div className={`text-xl font-bold font-mono ${m.color}`}>₹{fmt2(m.value)}</div>
-                    <div className="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">{m.sub}</div>
+                  <div key={m.label} className="p-4">
+                    <MetricCard label={m.label} value={`₹${fmt2(m.value)}`} sub={m.sub} color={m.color} center className="mx-auto" />
                   </div>
                 ))}
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                <MetricCard label="Additional Revenue" value={`₹${fmt2(r.additionalRevenue)}`} sub={`${fmt2(r.chickenProduction.benefit)} kg × ₹${params.chickenSellingPrice}/kg`} color="text-bentoli-green" center />
+                <MetricCard label="Additional Feed Cost" value={`₹${fmt2(r.additionalFeedCost)}`} sub="Extra chicken × feed × FCR" color={r.additionalFeedCost >= 0 ? 'text-rose-400' : 'text-bentoli-green'} center />
+                <MetricCard label="Net Indirect Revenue" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="Additional Revenue + Additional Feed Cost" color="text-bentoli-green" center />
               </div>
             </div>
           </section>
@@ -225,6 +235,12 @@ export default function App() {
               ].map(m => (
                 <MetricCard key={m.label} label={m.label} value={`₹${fmt2(m.value)}`} sub="per ton of feed" color={m.value >= 0 ? 'text-bentoli-navy' : 'text-rose-400'} icon={m.icon} trend={m.value >= 0 ? 'up' : 'down'} />
               ))}
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+              <MetricCard label="Treatment Feed Cost" value={`₹${fmt2(r.treatmentFeedCost)}/kg`} sub={`Base ₹${params.controlFeedCost} + Pelex ₹${(params.pelexCost * params.pelexDosage).toFixed(4)}`} color="text-bentoli-navy" />
+              <MetricCard label="Extra Chicken/Ton" value={`+${fmt2(r.chickenProduction.benefit)} kg`} sub="per ton of feed processed" color="text-bentoli-green" trend="up" trendLabel="Benefit" />
+              <MetricCard label="Chicken Selling Price" value={`₹${fmt2(params.chickenSellingPrice)}/kg`} sub="Market price" color="text-bentoli-navy" />
+              <MetricCard label="Net Benefit" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="per ton of feed" color="text-bentoli-green" trend="up" trendLabel="Benefit" />
             </div>
           </section>
 
