@@ -23,13 +23,13 @@ function SliderInput({ label, value, min, max, step, unit, onChange }: SliderInp
             step={step}
             min={min}
             max={max}
-              onChange={e => onChange(parseFloat(e.target.value) || 0)}
-              className="w-20 text-right text-xs bg-white text-bentoli-green font-mono font-semibold border border-slate-200 rounded px-1 py-0.5 focus:outline-none focus:border-bentoli-green"
+            onChange={e => onChange(parseFloat(e.target.value) || 0)}
+            className="w-20 text-right text-xs bg-white dark:bg-slate-700 text-bentoli-green dark:text-white font-mono font-semibold border border-slate-200 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:border-bentoli-green"
           />
           {unit && <span className="text-xs text-slate-500 w-8">{unit}</span>}
         </div>
       </div>
-      <div className="relative h-1.5 bg-gray-200 rounded-full">
+      <div className="relative h-1.5 bg-gray-200 rounded-full dark:bg-slate-700">
         <div
           className="absolute top-0 left-0 h-full bg-bentoli-green rounded-full"
           style={{ width: `${pct}%` }}
@@ -44,13 +44,13 @@ function SliderInput({ label, value, min, max, step, unit, onChange }: SliderInp
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
         <div
-          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-bentoli-green rounded-full border-2 border-white pointer-events-none"
+          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-bentoli-green rounded-full border-2 border-white dark:border-slate-800 pointer-events-none"
           style={{ left: `calc(${pct}% - 6px)` }}
         />
       </div>
       <div className="flex justify-between mt-0.5">
-        <span className="text-[10px] text-slate-600">{min}</span>
-        <span className="text-[10px] text-slate-600">{max}</span>
+        <span className="text-[10px] text-slate-600 dark:text-slate-400">{min}</span>
+        <span className="text-[10px] text-slate-600 dark:text-slate-400">{max}</span>
       </div>
     </div>
   );

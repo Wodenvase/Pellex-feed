@@ -19,13 +19,13 @@ function fmt(v: number) {
 
 export function CostTable({ title, rows, accentColor = 'border-emerald-500' }: Props) {
   return (
-    <div className={`bg-white rounded-xl border border-slate-200 overflow-hidden`}>
-      <div className={`px-4 py-2.5 border-b-2 ${accentColor} bg-white`}>
-        <h4 className="text-xs font-bold uppercase tracking-widest text-slate-800">{title}</h4>
+    <div className={`bg-white rounded-xl border border-slate-200 overflow-hidden dark:bg-slate-800 dark:border-slate-700`}>
+      <div className={`px-4 py-2.5 border-b-2 ${accentColor} bg-white dark:bg-slate-800`}>
+        <h4 className="text-xs font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100">{title}</h4>
       </div>
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b border-slate-200">
+          <tr className="border-b border-slate-200 dark:border-slate-700">
             <th className="text-left py-2 px-4 text-slate-600 font-medium">Category</th>
             <th className="text-right py-2 px-3 text-slate-500 font-medium">Control</th>
             <th className="text-right py-2 px-3 text-bentoli-green font-medium">Treatment</th>

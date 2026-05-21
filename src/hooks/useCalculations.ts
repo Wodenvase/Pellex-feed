@@ -56,7 +56,7 @@ export function useCalculations(p: InputParams): Results {
 
     const additionalRevenue = chickenBenefit * p.chickenSellingPrice;
     const additionalFeedCost = productionCost.benefit;
-    const netIndirectRevenue = additionalRevenue - additionalFeedCost;
+    const netIndirectRevenue = additionalRevenue + additionalFeedCost;
 
     const totalReturn = totalDirect.savings + netIndirectRevenue;
     const totalROI = (totalReturn / p.pelexCost) * 100;

@@ -7,7 +7,7 @@ import { WaterfallChart } from './components/WaterfallChart';
 import { MetricCard } from './components/MetricCard';
 import { useCalculations } from './hooks/useCalculations';
 import type { InputParams } from './types';
-import { TrendingUp, Zap, Flame, Settings, BarChart2, DollarSign, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, Zap, Flame, Settings, BarChart2, DollarSign, RotateCcw, ChevronLeft, ChevronRight, Sun, Moon } from 'lucide-react';
 import bentoliLogo from './assets/bentoli.png';
 
 const DEFAULT_PARAMS: InputParams = {
@@ -50,6 +50,7 @@ export default function App() {
   const [params, setParams] = useState<InputParams>(DEFAULT_PARAMS);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [dark, setDark] = useState(false);
   const r = useCalculations(params);
 
   const costRows = [
@@ -68,14 +69,16 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 flex flex-col">
-      <header className="bg-white border-b border-slate-200 px-5 py-3 flex items-center justify-between z-20 sticky top-0">
+    <div className={`${dark ? 'dark' : ''} min-h-screen bg-white text-slate-800 flex flex-col`}> 
+      <div className={`${dark ? 'dark' : ''} w-full`}> 
+      <div className={`min-h-screen ${dark ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-800'} flex flex-col`}>
+      <header className={`px-5 py-3 flex items-center justify-between z-20 sticky top-0 ${dark ? 'bg-slate-900 border-b border-slate-800' : 'bg-white border-b border-slate-200'}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
             <img src={bentoliLogo} alt="Bentoli" className="w-full h-full object-contain" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-sm font-bold text-slate-800">Pellet Feed ROI — Interactive Model</h1>
+            <h1 className="text-sm font-bold text-slate-800 dark:text-slate-100">PELEX ROI Calculator</h1>
             <p className="text-[10px] text-slate-500">Control vs Treatment (Pelex) — real-time analysis</p>
           </div>
         </div>
@@ -85,6 +88,9 @@ export default function App() {
             <span className="text-sm font-bold text-emerald-600 font-mono">{fmt2(r.totalROI)}%</span>
             <span className="text-[10px] text-slate-600">on ₹{params.pelexCost}/kg</span>
           </div>
+          <button onClick={() => setDark(d => !d)} className={`flex items-center justify-center w-9 h-9 rounded-md border ${dark ? 'border-slate-700 bg-slate-800 text-yellow-300' : 'border-slate-200 bg-white text-slate-600'} mr-2`} title="Toggle theme">
+            {dark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           <button
             onClick={() => setParams(DEFAULT_PARAMS)}
             className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300 rounded-lg px-2.5 py-1.5"
@@ -248,8 +254,8 @@ export default function App() {
                 <div className="grid grid-cols-3 divide-x divide-slate-200">
                   {[
                       { label: 'Additional Revenue', value: r.additionalRevenue, sub: `${r.chickenProduction.benefit.toFixed(3)} kg × ₹${params.chickenSellingPrice}/kg`, color: 'text-bentoli-green' },
-                      { label: 'Additional Feed Cost', value: -r.additionalFeedCost, sub: `Extra chicken × feed × FCR`, color: 'text-rose-400', abs: true },
-                      { label: 'Net Indirect Revenue', value: r.netIndirectRevenue, sub: 'Revenue − Additional Cost', color: r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400' },
+                      { label: 'Additional Feed Cost', value: r.additionalFeedCost, sub: 'Production Cost (Savings)', color: 'text-bentoli-navy' },
+                      { label: 'Net Indirect Revenue', value: r.netIndirectRevenue, sub: 'Revenue + Additional Feed Cost', color: r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400' },
                   ].map(m => (
                     <div key={m.label} className="p-4 text-center">
                       <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{m.label}</div>
