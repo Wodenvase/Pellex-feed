@@ -33,7 +33,7 @@ export function DonutChart({ title, slices, centerLabel, centerValue }: Props) {
     });
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
       <h4 className="text-xs font-semibold text-slate-300 mb-3 uppercase tracking-wider">{title}</h4>
       <div className="flex items-center gap-4">
         <svg width={160} height={160} className="flex-shrink-0">

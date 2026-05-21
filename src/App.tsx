@@ -69,10 +69,8 @@ export default function App() {
   ];
 
   return (
-    <div className={`${dark ? 'dark' : ''} min-h-screen bg-white text-slate-800 flex flex-col`}> 
-      <div className={`${dark ? 'dark' : ''} w-full`}> 
-      <div className={`min-h-screen ${dark ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-800'} flex flex-col`}>
-      <header className={`px-5 py-3 flex items-center justify-between z-20 sticky top-0 ${dark ? 'bg-slate-900 border-b border-slate-800' : 'bg-white border-b border-slate-200'}`}>
+    <div className={`${dark ? 'dark bg-slate-950 text-slate-100' : 'bg-white text-slate-800'} min-h-screen flex flex-col`}>
+      <header className="bg-white border-b border-slate-200 px-5 py-3 flex items-center justify-between z-20 sticky top-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
             <img src={bentoliLogo} alt="Bentoli" className="w-full h-full object-contain" />
@@ -88,8 +86,12 @@ export default function App() {
             <span className="text-sm font-bold text-emerald-600 font-mono">{fmt2(r.totalROI)}%</span>
             <span className="text-[10px] text-slate-600">on ₹{params.pelexCost}/kg</span>
           </div>
-          <button onClick={() => setDark(d => !d)} className={`flex items-center justify-center w-9 h-9 rounded-md border ${dark ? 'border-slate-700 bg-slate-800 text-yellow-300' : 'border-slate-200 bg-white text-slate-600'} mr-2`} title="Toggle theme">
-            {dark ? <Sun size={16} /> : <Moon size={16} />}
+          <button
+            onClick={() => setDark(d => !d)}
+            className="flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 hover:shadow-sm bg-white dark:bg-slate-800"
+            aria-label="Toggle theme"
+          >
+            {dark ? <Sun size={16} className="text-yellow-400" /> : <Moon size={16} className="text-slate-600" />}
           </button>
           <button
             onClick={() => setParams(DEFAULT_PARAMS)}
@@ -254,8 +256,8 @@ export default function App() {
                 <div className="grid grid-cols-3 divide-x divide-slate-200">
                   {[
                       { label: 'Additional Revenue', value: r.additionalRevenue, sub: `${r.chickenProduction.benefit.toFixed(3)} kg × ₹${params.chickenSellingPrice}/kg`, color: 'text-bentoli-green' },
-                      { label: 'Additional Feed Cost', value: r.additionalFeedCost, sub: 'Production Cost (Savings)', color: 'text-bentoli-navy' },
-                      { label: 'Net Indirect Revenue', value: r.netIndirectRevenue, sub: 'Revenue + Additional Feed Cost', color: r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400' },
+                      { label: 'Additional Feed Cost', value: -r.additionalFeedCost, sub: `Extra chicken × feed × FCR`, color: 'text-rose-400', abs: true },
+                      { label: 'Net Indirect Revenue', value: r.netIndirectRevenue, sub: 'Revenue − Additional Cost', color: r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400' },
                   ].map(m => (
                     <div key={m.label} className="p-4 text-center">
                       <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{m.label}</div>

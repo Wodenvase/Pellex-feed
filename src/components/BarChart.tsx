@@ -26,7 +26,7 @@ export function BarChart({ title, bars, unit = '', controlColor = '#94a3b8', tre
   const yTicks = 4;
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
       <h4 className="text-xs font-semibold text-slate-300 mb-3 uppercase tracking-wider">{title}</h4>
       <div className="flex items-end gap-1 mb-2 overflow-x-auto">
         <div className="flex flex-col justify-between h-[140px] pr-2 text-right flex-shrink-0">

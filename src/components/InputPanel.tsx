@@ -15,7 +15,7 @@ function SliderInput({ label, value, min, max, step, unit, onChange }: SliderInp
   return (
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-xs font-medium text-slate-300">{label}</span>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</span>
         <div className="flex items-center gap-1">
           <input
             type="number"
@@ -23,13 +23,13 @@ function SliderInput({ label, value, min, max, step, unit, onChange }: SliderInp
             step={step}
             min={min}
             max={max}
-            onChange={e => onChange(parseFloat(e.target.value) || 0)}
-            className="w-20 text-right text-xs bg-white dark:bg-slate-700 text-bentoli-green dark:text-white font-mono font-semibold border border-slate-200 dark:border-slate-600 rounded px-1 py-0.5 focus:outline-none focus:border-bentoli-green"
+              onChange={e => onChange(parseFloat(e.target.value) || 0)}
+              className="w-20 text-right text-xs bg-white dark:bg-slate-700 text-bentoli-green font-mono font-semibold border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 focus:outline-none focus:border-bentoli-green"
           />
           {unit && <span className="text-xs text-slate-500 w-8">{unit}</span>}
         </div>
       </div>
-      <div className="relative h-1.5 bg-gray-200 rounded-full dark:bg-slate-700">
+      <div className="relative h-1.5 bg-gray-200 dark:bg-slate-700 rounded-full">
         <div
           className="absolute top-0 left-0 h-full bg-bentoli-green rounded-full"
           style={{ width: `${pct}%` }}
