@@ -7,7 +7,7 @@ import { WaterfallChart } from './components/WaterfallChart';
 import { MetricCard } from './components/MetricCard';
 import { useCalculations } from './hooks/useCalculations';
 import type { InputParams } from './types';
-import { TrendingUp, Zap, Flame, Settings, BarChart2, DollarSign, RotateCcw, ChevronLeft, ChevronRight, Sun, Moon } from 'lucide-react';
+import { TrendingUp, Zap, Flame, Settings, BarChart2, DollarSign, Sun, Moon, ChevronsDown, X } from 'lucide-react';
 import bentoliLogo from './assets/bentoli.png';
 
 const DEFAULT_PARAMS: InputParams = {
@@ -33,25 +33,18 @@ const DEFAULT_PARAMS: InputParams = {
   pelexDosage: 0.001,
 };
 
-type Tab = 'overview' | 'costs' | 'indirect' | 'charts';
-
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: 'overview', label: 'Overview', icon: <BarChart2 size={13} /> },
-  { id: 'costs', label: 'Direct Costs', icon: <DollarSign size={13} /> },
-  { id: 'indirect', label: 'Indirect Benefits', icon: <TrendingUp size={13} /> },
-  { id: 'charts', label: 'Charts', icon: <BarChart2 size={13} /> },
-];
-
 function fmt2(v: number) {
   return v.toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 }
 
 export default function App() {
   const [params, setParams] = useState<InputParams>(DEFAULT_PARAMS);
-  const [activeTab, setActiveTab] = useState<Tab>('overview');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [dark, setDark] = useState(false);
+  const [ribbonExpanded, setRibbonExpanded] = useState(false);
   const r = useCalculations(params);
+
+  const headerHeight = 56;
+  const ribbonHeight = 140; // compact ribbon height (enough for controls)
 
   const costRows = [
     { label: 'Electricity Cost/ton', ...r.electricity },
@@ -70,265 +63,195 @@ export default function App() {
 
   return (
     <div className={`${dark ? 'dark bg-slate-950 text-slate-100' : 'bg-white text-slate-800'} min-h-screen flex flex-col`}>
-      <header className="bg-white border-b border-slate-200 px-5 py-3 flex items-center justify-between z-20 sticky top-0">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-5 py-3 flex items-center justify-between z-30 sticky top-0" style={{ height: headerHeight }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
             <img src={bentoliLogo} alt="Bentoli" className="w-full h-full object-contain" />
           </div>
           <div className="leading-tight">
             <h1 className="text-sm font-bold text-slate-800 dark:text-slate-100">PELEX ROI Calculator</h1>
-            <p className="text-[10px] text-slate-500">Control vs Treatment (Pelex) — real-time analysis</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">Control vs Treatment (Pelex) — real-time analysis</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-2 bg-gray-50 border border-slate-200 rounded-lg px-3 py-1.5">
-            <span className="text-[10px] text-slate-500">Total ROI</span>
+
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 bg-gray-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5">
+            <span className="text-[10px] text-slate-500 dark:text-slate-300">Total ROI</span>
             <span className="text-sm font-bold text-emerald-600 font-mono">{fmt2(r.totalROI)}%</span>
-            <span className="text-[10px] text-slate-600">on ₹{params.pelexCost}/kg</span>
+            <span className="text-[10px] text-slate-600 dark:text-slate-400">on ₹{params.pelexCost}/kg</span>
           </div>
+
           <button
             onClick={() => setDark(d => !d)}
-            className="flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 hover:shadow-sm bg-white dark:bg-slate-800"
+            className="flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:shadow-sm bg-white dark:bg-slate-800"
             aria-label="Toggle theme"
           >
-            {dark ? <Sun size={16} className="text-yellow-400" /> : <Moon size={16} className="text-slate-600" />}
-          </button>
-          <button
-            onClick={() => setParams(DEFAULT_PARAMS)}
-            className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-800 transition-colors border border-slate-200 hover:border-slate-300 rounded-lg px-2.5 py-1.5"
-          >
-            <RotateCcw size={11} />
-            <span className="hidden sm:inline">Reset</span>
+            {dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden h-[calc(100vh-53px)]">
-        <aside
-          className={`${sidebarOpen ? 'w-72' : 'w-0'} flex-shrink-0 bg-gray-50 border-r border-slate-200 overflow-hidden transition-all duration-200 relative`}
-        >
-          <div className="p-4 h-full overflow-y-auto">
-            <div className="mb-3">
-              <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-600">Input Parameters</h2>
-              <p className="text-[9px] text-slate-600 mt-0.5">Adjust sliders or type values to update all results live.</p>
+      {/* Compact horizontal ribbon (fixed) */}
+      <div
+        className="fixed left-0 right-0 z-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700"
+        style={{ top: headerHeight, height: ribbonHeight }}
+      >
+        <div className="px-4 py-3 h-full">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">Input Parameters</h2>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Adjust values to update results live</p>
             </div>
-            <InputPanel params={params} onChange={setParams} />
+            <div className="text-xs text-slate-500 dark:text-slate-400">Quick ribbon — scroll horizontally for more</div>
           </div>
-        </aside>
 
-        <button
-          onClick={() => setSidebarOpen(o => !o)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-white border border-slate-200 rounded-r-lg p-1 text-slate-600 hover:text-slate-800 transition-colors shadow-sm"
-          style={{ left: sidebarOpen ? '18rem' : '0rem' }}
-        >
-          {sidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
-        </button>
-
-        <main className="flex-1 overflow-y-auto p-5 relative">
-          <div className="flex gap-1 mb-5 bg-white rounded-lg p-1 w-fit border border-slate-200">
-            {TABS.map(tab => (
+          <div className="h-[120px] relative">
+            <div className="h-full">
+              <InputPanel params={params} onChange={setParams} compact />
+            </div>
+            <div className="absolute right-3 top-3">
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 ${
-                  activeTab === tab.id
-                    ? 'bg-bentoli-green text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-800'
-                }`}
+                onClick={() => setRibbonExpanded(e => !e)}
+                className="flex items-center gap-2 px-3 py-1 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
+                aria-expanded={ribbonExpanded}
+                aria-label="Expand inputs"
               >
-                {tab.icon}
-                {tab.label}
+                {ribbonExpanded ? <X size={14} /> : <ChevronsDown size={14} />}
+                <span className="hidden sm:inline">{ribbonExpanded ? 'Close' : 'Expand'}</span>
               </button>
-            ))}
+            </div>
           </div>
 
-          {activeTab === 'overview' && (
-            <div className="space-y-4 animate-fade-in">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <MetricCard label="Direct Savings/Ton" value={`₹${fmt2(r.totalDirect.savings)}`} sub="Processing cost reduction" color="text-bentoli-navy" icon={<DollarSign size={14} />} trend="up" />
-                <MetricCard label="FCR Benefit/Ton" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="Net indirect revenue" color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
-                <MetricCard label="Total Return/Ton" value={`₹${fmt2(r.totalReturn)}`} sub="Direct + Indirect benefits" color="text-bentoli-navy" icon={<BarChart2 size={14} />} trend={r.totalReturn >= 0 ? 'up' : 'down'} />
-                <MetricCard label="Total ROI" value={`${fmt2(r.totalROI)}%`} sub={`On ₹${params.pelexCost}/kg Pelex`} color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.totalROI >= 0 ? 'up' : 'down'} />
-              </div>
-
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <MetricCard label="Throughput Gain" value={`${r.throughputDiff >= 0 ? '+' : ''}${r.throughputDiff.toFixed(2)} t/hr`} sub={`${params.controlThroughput} → ${params.treatmentThroughput}`} color={r.throughputDiff >= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.throughputDiff >= 0 ? 'up' : 'down'} />
-                <MetricCard label="Ampere Change" value={`${r.ampereLoadDiff.toFixed(1)} A`} sub={`${params.controlAmpereLoad} → ${params.treatmentAmpereLoad}`} color={r.ampereLoadDiff <= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.ampereLoadDiff <= 0 ? 'up' : 'down'} />
-                <MetricCard label="FCR Change" value={`${r.fcrDiff >= 0 ? '+' : ''}${r.fcrDiff.toFixed(3)}`} sub={`${params.controlFCR} → ${params.treatmentFCR}`} color={r.fcrDiff <= 0 ? 'text-emerald-400' : 'text-rose-400'} trend={r.fcrDiff <= 0 ? 'up' : 'down'} />
-                <MetricCard label="Extra Chicken/Ton" value={`+${r.chickenProduction.benefit.toFixed(2)} kg`} sub={`${r.chickenProduction.control.toFixed(2)} → ${r.chickenProduction.treatment.toFixed(2)}`} color="text-emerald-400" trend="up" />
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <CostTable title="Performance Comparison" rows={perfRows} accentColor="border-slate-600" />
-                <WaterfallChart
-                  title="Savings Waterfall (Rs/ton)"
-                  steps={[
-                    { label: 'Electricity', value: r.electricity.savings, color: '#fbbf24' },
-                    { label: 'Boiler', value: r.boiler.savings, color: '#f97316' },
-                    { label: 'Die', value: r.die.savings, color: '#a78bfa' },
-                    { label: 'Fixed', value: r.fixedFactory.savings, color: '#38bdf8' },
-                    { label: 'Indirect', value: r.netIndirectRevenue },
-                    { label: 'TOTAL', value: r.totalReturn, isTotal: true },
-                  ]}
-                />
-              </div>
-
-              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                <div className="px-4 py-2.5 border-b-2 border-bentoli-green bg-white">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-800">ROI Summary</h4>
+          {ribbonExpanded && (
+            <div className="fixed left-0 right-0 z-40 top-[calc(56px+120px)] h-[60vh] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg">
+              <div className="p-4 h-full overflow-y-auto">
+                <div className="flex justify-end mb-2">
+                  <button
+                    onClick={() => setRibbonExpanded(false)}
+                    className="p-1 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
+                    aria-label="Close inputs"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-                <div className="grid grid-cols-3 divide-x divide-slate-200">
-                  {[
-                    { label: 'Processing Cost Savings/Ton', value: r.totalDirect.savings, sub: 'Direct Savings', color: 'text-bentoli-navy' },
-                    { label: 'FCR Benefit/Ton of Feed', value: r.netIndirectRevenue, sub: 'Indirect ROI', color: 'text-bentoli-green' },
-                    { label: 'Total Return/Ton of Feed', value: r.totalReturn, sub: `ROI: ${fmt2(r.totalROI)}% on ₹${params.pelexCost}`, color: 'text-bentoli-navy' },
-                  ].map(m => (
-                    <div key={m.label} className="p-4 text-center">
-                      <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{m.label}</div>
-                      <div className={`text-xl font-bold font-mono ${m.color}`}>₹{fmt2(m.value)}</div>
-                      <div className="text-[10px] text-slate-600 mt-0.5">{m.sub}</div>
-                    </div>
-                  ))}
-                </div>
+                <InputPanel params={params} onChange={setParams} compact={false} />
               </div>
             </div>
           )}
+        </div>
+      </div>
 
-          {activeTab === 'costs' && (
-            <div className="space-y-4">
-              <CostTable title="Direct Processing Cost Breakdown (Rs/ton)" rows={costRows} accentColor="border-sky-500" />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <DonutChart
-                  title="Control — Cost Structure (Rs/ton)"
-                  slices={[
-                    { label: 'Electricity', value: r.electricity.control, color: '#fbbf24' },
-                    { label: 'Boiler', value: r.boiler.control, color: '#f97316' },
-                    { label: 'Die Replacement', value: r.die.control, color: '#a78bfa' },
-                    { label: 'Fixed Factory', value: r.fixedFactory.control, color: '#38bdf8' },
-                  ]}
-                  centerLabel="Total/ton"
-                  centerValue={`₹${Math.round(r.totalDirect.control)}`}
-                />
-                <DonutChart
-                  title="Treatment (Pelex) — Cost Structure (Rs/ton)"
-                  slices={[
-                    { label: 'Electricity', value: r.electricity.treatment, color: '#fbbf24' },
-                    { label: 'Boiler', value: r.boiler.treatment, color: '#f97316' },
-                    { label: 'Die Replacement', value: r.die.treatment, color: '#a78bfa' },
-                    { label: 'Fixed Factory', value: r.fixedFactory.treatment, color: '#10b981' },
-                  ]}
-                  centerLabel="Total/ton"
-                  centerValue={`₹${Math.round(r.totalDirect.treatment)}`}
-                />
+      {/* Main content */}
+      <main className="flex-1 overflow-y-auto p-5 relative" style={{ marginTop: headerHeight + ribbonHeight }}>
+        <div className="space-y-6">
+          <section>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <MetricCard label="Direct Savings/Ton" value={`₹${fmt2(r.totalDirect.savings)}`} sub="Processing cost reduction" color="text-bentoli-navy" icon={<DollarSign size={14} />} trend="up" />
+              <MetricCard label="FCR Benefit/Ton" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="Net indirect revenue" color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
+              <MetricCard label="Total Return/Ton" value={`₹${fmt2(r.totalReturn)}`} sub="Direct + Indirect benefits" color="text-bentoli-navy" icon={<BarChart2 size={14} />} trend={r.totalReturn >= 0 ? 'up' : 'down'} />
+              <MetricCard label="Total ROI" value={`${fmt2(r.totalROI)}%`} sub={`On ₹${params.pelexCost}/kg Pelex`} color="text-bentoli-green" icon={<TrendingUp size={14} />} trend={r.totalROI >= 0 ? 'up' : 'down'} />
+            </div>
+          </section>
+
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <CostTable title="Performance Comparison" rows={perfRows} accentColor="border-slate-600" />
+            <WaterfallChart
+              title="Savings Waterfall (Rs/ton)"
+              steps={[
+                { label: 'Electricity', value: r.electricity.savings, color: '#fbbf24' },
+                { label: 'Boiler', value: r.boiler.savings, color: '#f97316' },
+                { label: 'Die', value: r.die.savings, color: '#a78bfa' },
+                { label: 'Fixed', value: r.fixedFactory.savings, color: '#38bdf8' },
+                { label: 'Indirect', value: r.netIndirectRevenue },
+                { label: 'TOTAL', value: r.totalReturn, isTotal: true },
+              ]}
+            />
+          </section>
+
+          <section>
+            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+              <div className="px-4 py-2.5 border-b-2 border-bentoli-green bg-white dark:bg-slate-800">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-800 dark:text-slate-200">ROI Summary</h4>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-3 divide-x divide-slate-200 dark:divide-slate-700">
                 {[
-                  { label: 'Electricity Savings', value: r.electricity.savings, icon: <Zap size={14} /> },
-                  { label: 'Boiler Savings', value: r.boiler.savings, icon: <Flame size={14} /> },
-                  { label: 'Die Savings', value: r.die.savings, icon: <Settings size={14} /> },
-                  { label: 'Fixed Cost Savings', value: r.fixedFactory.savings, icon: <DollarSign size={14} /> },
+                  { label: 'Processing Cost Savings/Ton', value: r.totalDirect.savings, sub: 'Direct Savings', color: 'text-bentoli-navy' },
+                  { label: 'FCR Benefit/Ton of Feed', value: r.netIndirectRevenue, sub: 'Indirect ROI', color: 'text-bentoli-green' },
+                  { label: 'Total Return/Ton of Feed', value: r.totalReturn, sub: `ROI: ${fmt2(r.totalROI)}% on ₹${params.pelexCost}`, color: 'text-bentoli-navy' },
                 ].map(m => (
-                  <MetricCard key={m.label} label={m.label} value={`₹${fmt2(m.value)}`} sub="per ton of feed" color={m.value >= 0 ? 'text-bentoli-navy' : 'text-rose-400'} icon={m.icon} trend={m.value >= 0 ? 'up' : 'down'} />
+                  <div key={m.label} className="p-4 text-center">
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{m.label}</div>
+                    <div className={`text-xl font-bold font-mono ${m.color}`}>₹{fmt2(m.value)}</div>
+                    <div className="text-[10px] text-slate-600 dark:text-slate-400 mt-0.5">{m.sub}</div>
+                  </div>
                 ))}
               </div>
             </div>
-          )}
+          </section>
 
-          {activeTab === 'indirect' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <CostTable
-                  title="Chicken Production (kg per ton of feed)"
-                  rows={[{ label: 'Chicken Production', control: r.chickenProduction.control, treatment: r.chickenProduction.treatment, savings: r.chickenProduction.benefit }]}
-                  accentColor="border-amber-500"
-                />
-                <CostTable
-                  title="Production Cost (Rs per ton of feed)"
-                  rows={[{ label: 'Production Cost', control: r.productionCost.control, treatment: r.productionCost.treatment, savings: r.productionCost.benefit }]}
-                  accentColor="border-rose-500"
-                />
-              </div>
-
-              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-                <div className="px-4 py-2.5 border-b-2 border-bentoli-green bg-white">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-800">Indirect Revenue Analysis (Per Ton of Feed)</h4>
-                </div>
-                <div className="grid grid-cols-3 divide-x divide-slate-200">
-                  {[
-                      { label: 'Additional Revenue', value: r.additionalRevenue, sub: `${r.chickenProduction.benefit.toFixed(3)} kg × ₹${params.chickenSellingPrice}/kg`, color: 'text-bentoli-green' },
-                      { label: 'Additional Feed Cost', value: -r.additionalFeedCost, sub: `Extra chicken × feed × FCR`, color: 'text-rose-400', abs: true },
-                      { label: 'Net Indirect Revenue', value: r.netIndirectRevenue, sub: 'Revenue − Additional Cost', color: r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400' },
-                  ].map(m => (
-                    <div key={m.label} className="p-4 text-center">
-                      <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{m.label}</div>
-                      <div className={`text-xl font-bold font-mono ${m.color}`}>
-                        {m.abs ? '-' : ''}₹{fmt2(Math.abs(m.value))}
-                      </div>
-                      <div className="text-[10px] text-slate-600 mt-0.5">{m.sub}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <MetricCard label="Treatment Feed Cost" value={`₹${r.treatmentFeedCost.toFixed(4)}/kg`} sub={`Base ₹${params.controlFeedCost} + Pelex ₹${(params.pelexCost * params.pelexDosage).toFixed(4)}`} color="text-slate-600" />
-                <MetricCard label="Extra Chicken/Ton" value={`+${r.chickenProduction.benefit.toFixed(3)} kg`} sub="per ton of feed processed" color="text-bentoli-green" trend="up" />
-                <MetricCard label="Chicken Selling Price" value={`₹${params.chickenSellingPrice}/kg`} sub="Market price" color="text-bentoli-navy" />
-                <MetricCard label="Net Benefit" value={`₹${fmt2(r.netIndirectRevenue)}`} sub="per ton of feed" color={r.netIndirectRevenue >= 0 ? 'text-bentoli-green' : 'text-rose-400'} trend={r.netIndirectRevenue >= 0 ? 'up' : 'down'} />
-              </div>
+          <section className="space-y-6">
+            <CostTable title="Direct Processing Cost Breakdown (Rs/ton)" rows={costRows} accentColor="border-sky-500" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <DonutChart
+                title="Control — Cost Structure (Rs/ton)"
+                slices={[
+                  { label: 'Electricity', value: r.electricity.control, color: '#fbbf24' },
+                  { label: 'Boiler', value: r.boiler.control, color: '#f97316' },
+                  { label: 'Die Replacement', value: r.die.control, color: '#a78bfa' },
+                  { label: 'Fixed Factory', value: r.fixedFactory.control, color: '#38bdf8' },
+                ]}
+                centerLabel="Total/ton"
+                centerValue={`₹${Math.round(r.totalDirect.control)}`}
+              />
+              <DonutChart
+                title="Treatment (Pelex) — Cost Structure (Rs/ton)"
+                slices={[
+                  { label: 'Electricity', value: r.electricity.treatment, color: '#fbbf24' },
+                  { label: 'Boiler', value: r.boiler.treatment, color: '#f97316' },
+                  { label: 'Die Replacement', value: r.die.treatment, color: '#a78bfa' },
+                  { label: 'Fixed Factory', value: r.fixedFactory.treatment, color: '#10b981' },
+                ]}
+                centerLabel="Total/ton"
+                centerValue={`₹${Math.round(r.totalDirect.treatment)}`}
+              />
             </div>
-          )}
 
-          {activeTab === 'charts' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <BarChart
-                  title="Direct Cost Comparison (Rs/ton)"
-                  bars={[
-                    { label: 'Electricity', control: r.electricity.control, treatment: r.electricity.treatment },
-                    { label: 'Boiler', control: r.boiler.control, treatment: r.boiler.treatment },
-                    { label: 'Die', control: r.die.control, treatment: r.die.treatment },
-                    { label: 'Fixed', control: r.fixedFactory.control, treatment: r.fixedFactory.treatment },
-                    { label: 'Total', control: r.totalDirect.control, treatment: r.totalDirect.treatment },
-                  ]}
-                  unit="Rs/ton"
-                />
-                <BarChart
-                  title="Performance Metrics (scaled)"
-                  bars={[
-                    { label: 'Throughput', control: params.controlThroughput, treatment: params.treatmentThroughput },
-                    { label: 'Amp ÷10', control: params.controlAmpereLoad / 10, treatment: params.treatmentAmpereLoad / 10 },
-                    { label: 'FCR×10', control: params.controlFCR * 10, treatment: params.treatmentFCR * 10 },
-                    { label: 'Feed Cost', control: params.controlFeedCost, treatment: r.treatmentFeedCost },
-                  ]}
-                />
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <WaterfallChart
-                  title="Full Savings Breakdown (Rs/ton)"
-                  steps={[
-                    { label: 'Electricity', value: r.electricity.savings, color: '#fbbf24' },
-                    { label: 'Boiler', value: r.boiler.savings, color: '#f97316' },
-                    { label: 'Die', value: r.die.savings, color: '#a78bfa' },
-                    { label: 'Fixed', value: r.fixedFactory.savings, color: '#38bdf8' },
-                    { label: 'Indirect', value: r.netIndirectRevenue },
-                    { label: 'TOTAL', value: r.totalReturn, isTotal: true },
-                  ]}
-                />
-                <BarChart
-                  title="Chicken Production & Revenue (per ton of feed)"
-                  bars={[
-                    { label: 'Chicken kg', control: r.chickenProduction.control, treatment: r.chickenProduction.treatment },
-                    { label: 'Prod Cost/100', control: r.productionCost.control / 100, treatment: r.productionCost.treatment / 100 },
-                    { label: 'Addl Rev', control: 0, treatment: r.additionalRevenue },
-                    { label: 'Net Indirect', control: 0, treatment: Math.max(r.netIndirectRevenue, 0) },
-                  ]}
-                />
-              </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[
+                { label: 'Electricity Savings', value: r.electricity.savings, icon: <Zap size={14} /> },
+                { label: 'Boiler Savings', value: r.boiler.savings, icon: <Flame size={14} /> },
+                { label: 'Die Savings', value: r.die.savings, icon: <Settings size={14} /> },
+                { label: 'Fixed Cost Savings', value: r.fixedFactory.savings, icon: <DollarSign size={14} /> },
+              ].map(m => (
+                <MetricCard key={m.label} label={m.label} value={`₹${fmt2(m.value)}`} sub="per ton of feed" color={m.value >= 0 ? 'text-bentoli-navy' : 'text-rose-400'} icon={m.icon} trend={m.value >= 0 ? 'up' : 'down'} />
+              ))}
             </div>
-          )}
-        </main>
-      </div>
+          </section>
+
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <WaterfallChart
+              title="Full Savings Breakdown (Rs/ton)"
+              steps={[
+                { label: 'Electricity', value: r.electricity.savings, color: '#fbbf24' },
+                { label: 'Boiler', value: r.boiler.savings, color: '#f97316' },
+                { label: 'Die', value: r.die.savings, color: '#a78bfa' },
+                { label: 'Fixed', value: r.fixedFactory.savings, color: '#38bdf8' },
+                { label: 'Indirect', value: r.netIndirectRevenue },
+                { label: 'TOTAL', value: r.totalReturn, isTotal: true },
+              ]}
+            />
+            <BarChart
+              title="Chicken Production & Revenue (per ton of feed)"
+              bars={[
+                { label: 'Chicken kg', control: r.chickenProduction.control, treatment: r.chickenProduction.treatment },
+                { label: 'Prod Cost/100', control: r.productionCost.control / 100, treatment: r.productionCost.treatment / 100 },
+                { label: 'Addl Rev', control: 0, treatment: r.additionalRevenue },
+                { label: 'Net Indirect', control: 0, treatment: Math.max(r.netIndirectRevenue, 0) },
+              ]}
+            />
+          </section>
+        </div>
+      </main>
     </div>
   );
 }
